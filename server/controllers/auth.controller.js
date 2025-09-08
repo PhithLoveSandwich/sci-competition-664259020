@@ -1,107 +1,76 @@
-import db from "../models/index.js";
-const User = db.User;
-const Role = db.Role;
-import config from "../config/auth.config.js"; // นำเข้า config สำหรับ JWT secret
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import db from "../models/index.js";
+import authConfig from "../config/auth.config.js";
 
-//import Operator
-import { Op } from "sequelize";
+const User = db.User;
 
-const authController = {};
+//Register
+const signUp = async (req, res) =>{
+    const {email, password, type, name} = req.body;
+    try {
+        if(!email, || !password || !type || !name) {
+            return res.status(400).send({message: "Email, Password, Type, and Name are required!"});
+        }
+        //Addition for Type
+        const allowedType = ['admin','teacher','judge'];
+        if (!allowedTypes.includes(type)) {
+            return res.status(400).send({ message: "Invalid user type. Must be Teacher, Admin, or Judge"});
+        }
+        //Addition for teacher
+        if(type === "teacher" && !school || !phone) {
+            return res.status(400).send({message: "school and phone are required for teacher"})
+        }
+        //Check if User alread exist
+        const existingUser = await User.findOne({
+            where:{
+                email: email,
+            },
+        });
+        if(existingUser){
+             return res.status(400).send({message: "User already existing, Please try to make one again."});
+        }
+        //Create User Object
+        const userData = {
+            name: name,
+            email: email,
+            password: password,
+            type: type,
+        }
+        if (type === "teacher") {
+            userData.school = school,
+            userData.phone = phone,
+        }
 
-authController.signup = async (req, res) => {
-    const { username, name, email, password } = req.body;
-    if (!username || !name || !email || !password) {
-        return res.status(400).send({ message: "Username, Name, Email or Password can not be empty!" });
+        //Create New User
+        const user = await User.create(userData);
+
+        if(type === "teacher") {
+            try {
+                const token = crypto.randomBytes(32).toString("hex");
+                const verification = await db.VerificationToken.create({
+                    token,
+                    userId: user.id,
+                    expriedAt: new Data(DataTransfer.now()+24*60*60*1000) //24 hours
+                })
+                
+            } catch (error) {
+
+            }
+        }
+        
+        //Of user is a teacher
+        if(type === "teacher") {
+            res.status(201).send({message: user.type === "teacher" ? "Registration sucessfilly! Please check your enauk to vertify your account" : "User registred successfully.",
+                user: {
+                    id:user.id,
+                    name:user.name,
+                    email:user.email,
+                    type:user.type,
+                    ...(user.type === "teacher" && {isVertified: user.isVertified}),
+                }
+             })
+        }
+    } catch (error) {
+
     }
-
-    await User.findOne({ where: { username: username } }).then(async user => {
-        if (user) {
-            res.status(400).send({ message: "Username already exists!" });
-            return;
-        }
-
-        const newUser = {
-            username,
-            name,
-            email,
-            password: bcrypt.hashSync(password, 8),
-        };
-
-        User.create(newUser).then((user) => {
-            if (req.body.roles) {
-                Role.findAll({
-                    where: {
-                        name: { [Op.or]: req.body.roles }
-                    }
-                }).then((roles) => {
-                    if (roles.length === 0) {
-                        Role.findOne({ where: { name: "teacher" } }).then((role) => {
-                            if (role) {
-                                user.setRoles([role.id]).then(() => {
-                                    res.send({ message: "User registered successfully!" });
-                                });
-                            } else {
-                                res.status(500).send({ message: "Default role 'user' not found." });
-                            }
-                        });
-                    } else {
-                        user.setRoles(roles).then(() => {
-                            res.send({ message: "User registered successfully!" });
-                        });
-                    }
-                });
-            } else {
-                Role.findOne({ where: { name: "teacher" } }).then((role) => {
-                    if (role) {
-                        user.setRoles([role.id]).then(() => {
-                            res.send({ message: "User registered successfully!" });
-                        });
-                    } else {
-                        res.status(500).send({ message: "Default role 'user' not found." });
-                    }
-                });
-            }
-        });
-    });
-};
-
-authController.signin = async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        res.status(400).send({ message: "Username or Password can not be empty!" });
-        return;
-    };
-    await User.findOne({ where: { username: username } }).then((user) => {
-        if (!user) {
-            res.status(404).send({ message: "User not found!" });
-            return;
-        }
-        const passwordIsValid = bcrypt.compareSync(password, user.password);
-        if (!passwordIsValid) {
-            res.status(401).send({ accessToken: null, message: "Invalid Password!" });
-            return;
-        }
-
-        const token = jwt.sign({ username: user.username }, config.secret, { expiresIn: 86400 }); // 24h 60s*60m*24h
-        user.getRoles().then((roles) => {
-            const authorities = [];
-            for (let i = 0; i < roles.length; i++) {
-                authorities.push("ROLE_" + roles[i].name.toUpperCase());
-            }
-            res.send({
-                token: token,
-                authorities: authorities,
-                userinfo: {
-                    name: user.name,
-                    email: user.email,
-                    username: user.username,
-                },
-            });
-        }).catch((error) => {
-            res.status(404).send({ message: "something went wrong while signing in" });
-        });
-    });
-};
-export default authController;
+}

@@ -1,23 +1,54 @@
 import {DataTypes} from "sequelize"
 import sequelize from "./db.js"
+import bcrypt  from "bcrypt.js"
 const User = sequelize.define("user",{
-    username:{
-        type: DataTypes.STRING,
+
+    id:{
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         primaryKey: true,
-        allNull: false,
+        allowNull: false,
     },
     name: {
         type: DataTypes.STRING,
-        allNull: false,
+        allowNull: false,
     },
     email: {
         type: DataTypes.STRING,
-        allNull: false,
+        allowNull: false,
+        unique:true,
+        validate:{
+            isEmail: true
+        }
     },
     password: {
         type: DataTypes.STRING,
-        allNull: false,
+        allowNull: false,
     },
+    type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    isVertified: {
+        type: DataTypes.BOOLEAN,
+        default: false,
+        allowNull: false,
+    }
+}, {
+    hooks: {
+        beforeCreated: async (user) => {
+            if(user.password){
+                const salt = await bcrypt.genSalt(10);
+                user.password =  await bcrypt.hash(user.password, salt);
+            }
+        },
+        beforeUpdate: async (user) =>{
+            if(user.changed('password')){
+                const salt = await bcrypt.genSalt(10);
+                user.password =  await bcrypt.hash(user.password, salt);
+            }
+        }
+    }
 });
 
 User.sync({ force : false })
@@ -27,5 +58,9 @@ User.sync({ force : false })
     .catch((error)=>{
         console.log("Error creating table", error);
     });
-    
+
+User.prototype.comparePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+}
+
 export default User;

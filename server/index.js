@@ -1,9 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import Role from "./models/role_model.js";
 import sequelize from "./models/db.js";
 import activityRouter from "./routers/activity.router.js";
-import authRouter from "./routers/auth.router.js";
+//import authRouter from "./routers/auth.router.js";
 
 dotenv.config();
 const app = express();
@@ -38,7 +37,7 @@ app.get('/', (req, res) => {
 });
 
 app.use("/api/v1/activity", activityRouter);
-app.use("/api/v1/auth", authRouter);
+//app.use("/api/v1/auth", authRouter);
 
 app.listen(PORT, () => {
     console.log("listening too http://localhost:" + PORT);
