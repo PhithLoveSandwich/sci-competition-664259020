@@ -1,11 +1,8 @@
 import User from "./user_model.js"
-import { DataTypes } from "sequelize";
 import sequelize from "./db.js";
-
-const Admin = User.init(
-    {},
-    {
-            scopes: {
+const Admin = User.init({},{
+    sequelize,
+    scopes: {
         defaultScope:{
             where:{
                 type: "admin",
@@ -13,7 +10,7 @@ const Admin = User.init(
         }
     }
     }, {
-    hook: {
+    hooks: {
         beforeCreate: (admin) => {
             admin.type = "admin";
         }

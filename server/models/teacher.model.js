@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import User from "./user_model.js"
-
+import sequelize from "./db.js";
 const Teacher = User.init(
     {},
     {
@@ -12,6 +12,7 @@ const Teacher = User.init(
         type: DataTypes.STRING,
         allowNull: false,
     },
+    sequelize,
     scopes: {
         defaultScope:{
             where:{
@@ -20,7 +21,7 @@ const Teacher = User.init(
         }
     }
 }, {
-    hook: {
+    hooks: {
         beforeCreate: (teacher) => {
             teacher.type = "teacher";
         }

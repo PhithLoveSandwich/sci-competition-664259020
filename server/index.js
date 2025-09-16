@@ -2,43 +2,39 @@ import express from "express";
 import dotenv from "dotenv";
 import sequelize from "./models/db.js";
 import activityRouter from "./routers/activity.router.js";
-//import authRouter from "./routers/auth.router.js";
+import authRouter from "./routers/auth.router.js";
 
 dotenv.config();
+const NODE_ENV = process.env.NODE_ENV || "development";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// const initRole = async () => {
-//   try {
-//     await Role.create({ id: "1", name: "admin" });
-//     await Role.create({ id: "2", name: "manager" });
-//     await Role.create({ id: "3", name: "teacher" });
-//     await Role.create({ id: "4", name: "judge" });
-//     console.log("Roles created.");
-//   } catch (error) {
-//     console.error("Error creating roles:", error);
-//   }
-// };
+const initDatabase = async () => {
+  try {
+    await sequelize.authenticate();  
+    console.log("Database Connection established successfully");
 
-// sequelize.sync({ force: true })
-//   .then(() => {
-//     console.log("Database synced");
-//     return initRole();
-//   })
-//   .catch(err => {
-//     console.error("Error syncing database:", err);
-//   });
+    if (NODE_ENV === "development") {
+      await sequelize.sync({ alter: true }); 
+      console.log("Database Synced in development mode");
+    }
+  } catch (error) {
+    console.log("Unable to connect to database", error);
+  }
+};
 
-app.get('/', (req, res) => {
-  res.send('Sci-Competition Api');
+initDatabase(); 
+
+app.get("/", (req, res) => {
+  res.send("Sci-Competition Api");
 });
 
 app.use("/api/v1/activity", activityRouter);
-//app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/auth", authRouter);
 
 app.listen(PORT, () => {
-    console.log("listening too http://localhost:" + PORT);
+  console.log("listening to http://localhost:" + PORT);
 });

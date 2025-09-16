@@ -1,9 +1,9 @@
-import {DataTypes} from "sequelize"
-import sequelize from "./db.js"
-import bcrypt  from "bcrypt.js"
-const User = sequelize.define("user",{
+import { DataTypes } from "sequelize";
+import sequelize from "./db.js";
+import bcrypt from "bcryptjs"; 
 
-    id:{
+const User = sequelize.define("user", {
+    id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
@@ -16,8 +16,8 @@ const User = sequelize.define("user",{
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique:true,
-        validate:{
+        unique: true,
+        validate: {
             isEmail: true
         }
     },
@@ -31,36 +31,36 @@ const User = sequelize.define("user",{
     },
     isVertified: {
         type: DataTypes.BOOLEAN,
-        default: false,
+        defaultValue: false,
         allowNull: false,
     }
 }, {
     hooks: {
-        beforeCreated: async (user) => {
-            if(user.password){
+        beforeCreate: async (user) => {
+            if (user.password) {
                 const salt = await bcrypt.genSalt(10);
-                user.password =  await bcrypt.hash(user.password, salt);
+                user.password = await bcrypt.hash(user.password, salt);
             }
         },
-        beforeUpdate: async (user) =>{
-            if(user.changed('password')){
+        beforeUpdate: async (user) => {
+            if (user.changed("password")) {
                 const salt = await bcrypt.genSalt(10);
-                user.password =  await bcrypt.hash(user.password, salt);
+                user.password = await bcrypt.hash(user.password, salt);
             }
         }
     }
 });
 
-User.sync({ force : false })
+User.sync({ force: false })
     .then(() => {
         console.log("Table User created or already exists");
     })
-    .catch((error)=>{
+    .catch((error) => {
         console.log("Error creating table", error);
     });
 
 User.prototype.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
-}
+};
 
 export default User;

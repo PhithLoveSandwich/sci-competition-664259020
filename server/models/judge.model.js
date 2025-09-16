@@ -1,6 +1,7 @@
 import User from "./user_model.js"
-
+import sequelize from "./db.js";
 const Judge = User.init({},{
+    sequelize,
     scopes: {
         defaultScope:{
             where:{
@@ -9,7 +10,7 @@ const Judge = User.init({},{
         }
     }
 }, {
-    hook: {
+    hooks: {
         beforeCreate: (judge) => {
             judge.type = "judge";
         }

@@ -20,16 +20,16 @@ const verifyToken = (req, res, next) => {
     });
 };
 
-const isAdmin = (req,res,next) => {
+const isManager = (req,res,next) => {
     User.findByPk(req.username).then((user) => {
         user.getRoles().then((roles) => {
             for (let i = 0; i < roles.length; i++) {
-                if (roles[i].name === "admin") {
+                if (roles[i].name === "manager") {
                     next();
                     return;
                 }
             }
-            return res.status(401).send({ message: "Unauthorized access, require admin role!" });
+            return res.status(401).send({ message: "Unauthorized access, require manager role!" });
             
         });
     });

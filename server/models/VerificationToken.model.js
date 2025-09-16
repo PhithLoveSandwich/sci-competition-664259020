@@ -27,4 +27,12 @@ const VerificationToken = sequelize.define("verificationToken", {
   },
 });
 
+VerificationToken.sync({ force: false })
+    .then(() => {
+        console.log("Table VerificationToken created or already exists");
+    })
+    .catch((error) => {
+        console.log("Error creating table", error);
+    });
+
 export default VerificationToken;

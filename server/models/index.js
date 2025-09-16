@@ -19,8 +19,8 @@ db.Judge = Judge;
 db.VerificationToken = VerificationToken;
 
 //Association
-db.User.hasMany(db.VerificationToken, { foreignKey: "userId" });
-db.VerificationToken.belongsTo(db.User, { foreignKey: "userId" });
+db.VerificationToken.belongsTo(db.User, {foreignKey: "userId"});
+db.User.belongsTo(db.VerificationToken, {foreignKey: "userId"});
 
 
 export default db;
