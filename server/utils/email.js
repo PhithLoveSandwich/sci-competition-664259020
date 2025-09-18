@@ -3,28 +3,27 @@ import dotenv from "dotenv";
 import { getVerificationEmailTemplate } from "./emailTemplate.js"
 
 dotenv.config();
-//create Gmail transporter
-const transporter = nodemailer.createTestAccount({
-    service:'gmail',
-    auth:{
-        user:process.env.SMTP_USER,
+// create Gmail transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.STMP_USER,
         pass:process.env.STMP_PASSWORD,
     }
 });
 
-//Vertify
-transporter.vertify(function (error, sucsess){
-    if(error){
-        console.log("STMP Connection error", error);
-    }
-    if(sucsess){
-        console.log("STMP Server is readt to send mail");
+//Verify SMTP connection
+transporter.verify((error, success) => {
+    if (error) {
+        console.error("SMTP Connection Error:", error);
+    } else {
+        console.log('SMTP Server is ready to send email');
     }
 });
 
 // send verification email
 export const sendVerificationEmail = async (email,token,userName) => {
-    const getVerificationEmailTemplate  = `${process.env.BASE_URL}/api/v1/auth/verify/${token}`;
+    const verificationUrl  = `${process.env.BASE_URL}/api/v1/auth/verify/${token}`;
 
     const mailOptions = {
         from:{

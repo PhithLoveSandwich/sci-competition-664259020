@@ -21,7 +21,7 @@ const VerificationToken = sequelize.define("verificationToken", {
       key: "id",
     }
   },
-  expireAt: {
+  expiredAt: {
     type: DataTypes.DATE,
     allowNull: false,
   },

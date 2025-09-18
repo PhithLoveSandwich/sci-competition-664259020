@@ -1,7 +1,6 @@
 import User from "./user_model.js"
 import sequelize from "./db.js";
 const Admin = User.init({},{
-    sequelize,
     scopes: {
         defaultScope:{
             where:{

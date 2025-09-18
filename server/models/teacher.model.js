@@ -12,7 +12,6 @@ const Teacher = User.init(
         type: DataTypes.STRING,
         allowNull: false,
     },
-    sequelize,
     scopes: {
         defaultScope:{
             where:{

@@ -29,11 +29,20 @@ const User = sequelize.define("user", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    // Teacher Attribute
+    school:{
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    phone:{
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     isVertified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false,
-    }
+    },
 }, {
     hooks: {
         beforeCreate: async (user) => {
