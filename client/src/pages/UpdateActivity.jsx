@@ -27,7 +27,7 @@ const UpdateActivity = () => {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const res = await ActivityServices.getActivity(id);
+        const res = await ActivityServices.getActivityById(id);
         setActivity(res.data);
       } catch (error) {
         Swal.fire({
@@ -57,7 +57,7 @@ const UpdateActivity = () => {
         timer: 1500
       });
 
-      navigate("/activities"); // กลับไปหน้ากิจกรรม
+      navigate("/");
     } catch (error) {
       Swal.fire({
         icon: "error",

@@ -1,10 +1,13 @@
 // src/pages/AddActivity.jsx
 import React, { useState } from "react";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 import ActivityService from "../services/activity_services";
 
 const AddActivity = () => {
-  const [activity, setActivity] = useState({
+  const navigate = useNavigate();
+
+  const initialActivity = {
     name: "",
     description: "",
     type: "",
@@ -18,62 +21,51 @@ const AddActivity = () => {
     contact_phone: "",
     contact_email: "",
     status: ""
-  });
+  };
+
+  const [activity, setActivity] = useState(initialActivity);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setActivity((prev) => ({ ...prev, [name]: value }));
+    setActivity({ ...activity, [name]: value });
   };
 
-    const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-        const payload = {
+      const payload = {
         ...activity,
-        team_size: parseInt(activity.team_size),
-        date: new Date(activity.date).toISOString(),
-        reg_open: new Date(activity.reg_open).toISOString(),
-        reg_close: new Date(activity.reg_close).toISOString(),
-        };
+        team_size: activity.team_size ? parseInt(activity.team_size) : 0,
+        date: activity.date ? new Date(activity.date).toISOString() : null,
+        reg_open: activity.reg_open ? new Date(activity.reg_open).toISOString() : null,
+        reg_close: activity.reg_close ? new Date(activity.reg_close).toISOString() : null,
+      };
 
-        const newActivity = await ActivityService.createActivity(payload);
+      const token = localStorage.getItem("accessToken"); // ดึง token
+      const newActivity = await ActivityService.createActivity(payload, token); // ส่ง token ไปด้วย
 
-        if (newActivity.status === 201) {
+      if (newActivity.status === 201) {
         Swal.fire({
-            title: "Add New Activity",
-            text: "Add new Activity Successfully",
-            icon: "success",
+          icon: "success",
+          title: "Success",
+          text: "Activity added successfully!",
+          showConfirmButton: false,
+          timer: 1500,
         });
-        setActivity({
-            name: "",
-            description: "",
-            type: "",
-            level: "",
-            team_size: "",
-            date: "",
-            location: "",
-            reg_open: "",
-            reg_close: "",
-            contact_name: "",
-            contact_phone: "",
-            contact_email: "",
-            status: ""
-        });
-        } else {
-        Swal.fire({
-            title: "Add New Activity",
-            text: "Failed to add activity",
-            icon: "error",
-        });
-        }
+
+        setActivity(initialActivity); // รีเซ็ตฟอร์ม
+        navigate("/"); // กลับหน้า list activities
+      }
     } catch (error) {
-        Swal.fire({
-        title: "Add New Activity",
-        text: "An error occurred while adding activity",
+      Swal.fire({
         icon: "error",
-        });
-        console.error(error);
+        title: "Error",
+        text: error.response?.data?.message || "Failed to add activity",
+      });
+      console.error("Error adding activity:", error);
     }
-    };
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
@@ -83,172 +75,45 @@ const AddActivity = () => {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Name:</label>
-            <input
-              type="text"
-              name="name"
-              value={activity.name}
-              onChange={handleChange}
-              placeholder="ชื่อกิจกรรม"
-              required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Description:</label>
-            <textarea
-              name="description"
-              value={activity.description}
-              onChange={handleChange}
-              placeholder="คำอธิบายกิจกรรม"
-              required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Type */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Type:</label>
-            <input
-              type="text"
-              name="type"
-              value={activity.type}
-              onChange={handleChange}
-              placeholder="ประเภทกิจกรรม"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Level */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Level:</label>
-            <input
-              type="text"
-              name="level"
-              value={activity.level}
-              onChange={handleChange}
-              placeholder="ระดับกิจกรรม"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Team Size */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Team size:</label>
-            <input
-              type="number"
-              name="team_size"
-              value={activity.team_size}
-              onChange={handleChange}
-              placeholder="จำนวนสมาชิกในทีม"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Date */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Opem:</label>
-            <input
-              type="date"
-              name="date"
-              value={activity.date}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Location */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Venue:</label>
-            <input
-              type="text"
-              name="location"
-              value={activity.location}
-              onChange={handleChange}
-              placeholder="สถานที่จัดกิจกรรม"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Registration Open */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Open:</label>
-            <input
-              type="date"
-              name="reg_open"
-              value={activity.reg_open}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Registration Close */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Closed:</label>
-            <input
-              type="date"
-              name="reg_close"
-              value={activity.reg_close}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Contact Name */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Contract Name:</label>
-            <input
-              type="text"
-              name="contact_name"
-              value={activity.contact_name}
-              onChange={handleChange}
-              placeholder="ชื่อผู้ติดต่อ"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Contact Phone */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Telephone:</label>
-            <input
-              type="tel"
-              name="contact_phone"
-              value={activity.contact_phone}
-              onChange={handleChange}
-              placeholder="เบอร์โทรศัพท์"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Contact Email */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Contract Email:</label>
-            <input
-              type="email"
-              name="contact_email"
-              value={activity.contact_email}
-              onChange={handleChange}
-              placeholder="อีเมลผู้ติดต่อ"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Status:</label>
-            <input
-              type="text"
-              name="status"
-              value={activity.status}
-              onChange={handleChange}
-              placeholder="สถานะกิจกรรม"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-            />
-          </div>
+          {[
+            { label: "Name", name: "name", type: "text", placeholder: "ชื่อกิจกรรม", required: true },
+            { label: "Description", name: "description", type: "textarea", placeholder: "คำอธิบายกิจกรรม", required: true },
+            { label: "Type", name: "type", type: "text", placeholder: "ประเภทกิจกรรม" },
+            { label: "Level", name: "level", type: "text", placeholder: "ระดับกิจกรรม" },
+            { label: "Team size", name: "team_size", type: "number", placeholder: "จำนวนสมาชิกในทีม" },
+            { label: "Date", name: "date", type: "date" },
+            { label: "Venue", name: "location", type: "text", placeholder: "สถานที่จัดกิจกรรม" },
+            { label: "Open", name: "reg_open", type: "date" },
+            { label: "Closed", name: "reg_close", type: "date" },
+            { label: "Contact Name", name: "contact_name", type: "text", placeholder: "ชื่อผู้ติดต่อ" },
+            { label: "Telephone", name: "contact_phone", type: "tel", placeholder: "เบอร์โทรศัพท์" },
+            { label: "Contact Email", name: "contact_email", type: "email", placeholder: "อีเมลผู้ติดต่อ" },
+            { label: "Status", name: "status", type: "text", placeholder: "สถานะกิจกรรม" }
+          ].map((field) => (
+            <div key={field.name}>
+              <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">{field.label}:</label>
+              {field.type === "textarea" ? (
+                <textarea
+                  name={field.name}
+                  value={activity[field.name]}
+                  onChange={handleChange}
+                  placeholder={field.placeholder}
+                  required={field.required}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
+                />
+              ) : (
+                <input
+                  type={field.type}
+                  name={field.name}
+                  value={activity[field.name]}
+                  onChange={handleChange}
+                  placeholder={field.placeholder}
+                  required={field.required}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
+                />
+              )}
+            </div>
+          ))}
 
           {/* Submit Button */}
           <div className="flex justify-center mt-6">

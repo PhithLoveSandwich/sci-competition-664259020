@@ -8,6 +8,9 @@ import Home from "../pages/Home.jsx";
 import NotFound from "../pages/NotFound.jsx";
 import AddActivity from "../pages/AddActivity.jsx";
 import UpdateActivity from "../pages/UpdateActivity.jsx";
+import NotAllowed from "../pages/NotAllowed";
+import AdminPage from "../pages/AdminPage";
+import UserPage from "../pages/UserPage";
 
 const router = createBrowserRouter([
   {
@@ -28,19 +31,23 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        element: <Profile />,
+        element: <UserPage> <Profile /> </UserPage>,
       },
       {
         path: "/add-activity",
-        element: <AddActivity />
+        element: <AdminPage> <AddActivity /> </AdminPage>
       },
       {
         path: "update-activity/:id",
-        element: <UpdateActivity />
+        element: <AdminPage> <UpdateActivity /> </AdminPage>
       },
       {
         path: "*",
         element: <NotFound />
+      },
+      {
+         path: "/notallowed",
+         element: <NotAllowed />,
       },
     ],
   },

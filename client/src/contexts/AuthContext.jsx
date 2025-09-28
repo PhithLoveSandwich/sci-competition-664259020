@@ -12,12 +12,15 @@ function getUser() {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getUser());
 
-  // ฟังก์ชัน signin
-  const signin = async (email, password) => {
-    const userData = await AuthServices.signin(email, password);
-    setUser(userData); // sync state
-    return userData;
-  };
+const signin = async (email, password) => {
+  const userData = await AuthServices.signin(email, password);
+  // เก็บ token ใน localStorage
+  localStorage.setItem("accessToken", userData.accessToken);
+  // เก็บ user ไว้ใน context state
+  setUser(userData.user);
+  return userData;
+};
+
 
   // ฟังก์ชัน logout
   const logout = () => {
