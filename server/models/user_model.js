@@ -38,7 +38,7 @@ const User = sequelize.define("user", {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    isVertified: {
+    isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false,

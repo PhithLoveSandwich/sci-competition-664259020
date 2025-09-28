@@ -1,0 +1,45 @@
+import { useState, useContext, createContext, useEffect } from "react";
+import AuthServices from "../services/auth_services";
+import TokenService from "../services/token_services";
+
+const AuthContext = createContext(null);
+
+// ฟังก์ชันดึง user จาก localStorage
+function getUser() {
+  return TokenService.getUser();
+}
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(getUser());
+
+  // ฟังก์ชัน signin
+  const signin = async (email, password) => {
+    const userData = await AuthServices.signin(email, password);
+    setUser(userData); // sync state
+    return userData;
+  };
+
+  // ฟังก์ชัน logout
+  const logout = () => {
+    AuthServices.logout();
+    setUser(null);
+  };
+
+  // sync user state กับ localStorage
+  useEffect(() => {
+    if (user) {
+      TokenService.setUser(user);
+    } else {
+      TokenService.removeUser();
+    }
+  }, [user]);
+
+  return (
+    <AuthContext.Provider value={{ user, signin, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// hook สำหรับเรียกใช้ context
+export const useAuthContext = () => useContext(AuthContext);

@@ -15,41 +15,65 @@ const verifyToken = (req, res, next) => {
         if (err) {
             return res.status(401).send({ message: "Unauthorized!" });
         }
-        req.username = decoded.username;
+        req.userId = decoded.id;
         next();
     });
 };
 
-const isManager = (req,res,next) => {
-    User.findByPk(req.username).then((user) => {
-        user.getRoles().then((roles) => {
-            for (let i = 0; i < roles.length; i++) {
-                if (roles[i].name === "manager") {
-                    next();
-                    return;
-                }
+const isAdmin = (req, res, next) => {
+    User.findByPk(req.userId)
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({ message: "User not found!" });
             }
-            return res.status(401).send({ message: "Unauthorized access, require manager role!" });
-            
-        });
-    });
-}
 
-const isModOrAdmin = (req,res,next) => {
-    User.findByPk(req.username).then((user) => {
-        user.getRoles().then((roles) => {
-            for (let i = 0; i < roles.length; i++) {
-                if (roles[i].name === "admin" || roles[i].name === "moderator" ) {
-                    next();
-                    return;
-                }
+            if (user.type === "admin") {
+                return next(); 
             }
-            return res.status(401).send({ message: "Unauthorized access, require admin or moderator role!" });
-            
-        });
-    });
-}
 
-const authJwt = { verifyToken, isAdmin, isModOrAdmin };
+            return res.status(401).send({ message: "Unauthorized access, require admin role!" });
+        })
+        .catch(error => {
+            return res.status(500).send({ message: error.message || "Some error occurred while checking admin role" });
+        });
+};
+
+const isTeacher = (req, res, next) => {
+    User.findByPk(req.userId)
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({ message: "User not found!" });
+            }
+
+            if (user.type === "teacher") {
+                return next(); 
+            }
+
+            return res.status(401).send({ message: "Unauthorized access, require admin role!" });
+        })
+        .catch(error => {
+            return res.status(500).send({ message: error.message || "Some error occurred while checking admin role" });
+        });
+};
+
+const isJudge = (req, res, next) => {
+    User.findByPk(req.userId)
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({ message: "User not found!" });
+            }
+
+            if (user.type === "judge") {
+                return next(); 
+            }
+
+            return res.status(401).send({ message: "Unauthorized access, require admin role!" });
+        })
+        .catch(error => {
+            return res.status(500).send({ message: error.message || "Some error occurred while checking admin role" });
+        });
+};
+
+const authJwt = { verifyToken ,isAdmin , isTeacher,isJudge};
 
 export default authJwt;
