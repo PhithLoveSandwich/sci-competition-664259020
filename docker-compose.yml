@@ -1,10 +1,10 @@
 services:
-  server: 
+  server:
     build:
       context: ./server
       dockerfile: Dockerfile.server
     ports:
-      - "5001:5000"
+      - "3000:5000"
     volumes:
       - "./server:/app"
       - "/app/node_modules"
@@ -20,6 +20,19 @@ services:
       - SERVER_PORT=5000
     depends_on:
       - db
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.client
+    ports:
+      - "5173:5174"
+    volumes:
+      - "./client:/app"
+      - "/app/node_modules"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - server
   db:
     image: postgres:16
     restart: always

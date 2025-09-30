@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ยืนยันอีเมลสำเร็จ - การแข่งขันวันวิทยาศาสตร์</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: "Sarabun", sans-serif;
+        background-color: #f3f4f6; /* สีพื้นหลังใกล้ SignIn */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 90%;
+      }
+      h1 {
+        color: #1f2937; /* สี text แบบ SignIn */
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: #10b981; /* สีเขียว success */
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .success-icon svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+      }
+      p {
+        color: #4b5563; /* สี text เนื้อหา */
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+      }
+      .button {
+        display: inline-block;
+        background: #3b82f6; /* สีปุ่มแบบ SignIn */
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      .button:hover {
+        background: #2563eb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h1>ยืนยันอีเมลสำเร็จ!</h1>
+      <p>
+        ขอบคุณที่ลงทะเบียนเข้าร่วมการแข่งขันวันวิทยาศาสตร์<br />
+        ตอนนี้ท่านสามารถเข้าสู่ระบบและเริ่มใช้งานได้ทันที
+      </p>
+      <a href="http://localhost:5173/login" class="button">เข้าสู่ระบบ</a>
+    </div>
+  </body>
+</html>
