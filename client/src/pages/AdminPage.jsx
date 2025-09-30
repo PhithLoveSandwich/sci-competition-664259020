@@ -5,7 +5,7 @@ const AdminPage = ({ children }) => {
     const { user } = useAuthContext();
 
     if (!user) {
-        return <Navigate to="/signin" replace />;
+        return <Navigate to="/login" replace />;
     }
 
     if (user.type !== "admin") {

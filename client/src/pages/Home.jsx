@@ -63,7 +63,7 @@ const Home = () => {
             type="search"
             name="keyword"
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="🔍 ค้นหากิจกรรม..."
+            placeholder="ค้นหากิจกรรม..."
             className="w-full px-4 py-3 pl-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           />
           <span className="absolute left-3 top-3 text-gray-400">🔍</span>

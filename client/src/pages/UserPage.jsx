@@ -4,9 +4,9 @@ import { useAuthContext } from "../contexts/AuthContext";
 const UserPage = ({ children }) => {
     const { user } = useAuthContext();
 
-    // ถ้ายังไม่ล็อกอิน ให้ไปหน้า signin
+    // ถ้ายังไม่ล็อกอิน ให้ไปหน้า login
     if (!user) {
-        return <Navigate to="/signin" replace />;
+        return <Navigate to="/login" replace />;
     }
 
     // ถ้าล็อกอินแล้ว ให้แสดง children
